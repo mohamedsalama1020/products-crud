@@ -53,7 +53,7 @@ $(document).ready(function() {
         }
     });
 
-    @if(isset($product))
+    /*@if(isset($product))
         var categoryOption = new Option(
             '{{ $product->category->getTranslation("name", app()->getLocale()) }}',
             '{{ $product->category_id }}',
@@ -61,7 +61,7 @@ $(document).ready(function() {
             true
         );
         $('#category_id').append(categoryOption).trigger('change');
-    @endif
+    @endif*/
 });
 </script>
 @endpush
