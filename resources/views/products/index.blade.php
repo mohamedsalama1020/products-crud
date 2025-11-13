@@ -6,9 +6,6 @@
     <div class="mb-3">
         <select id="filterByCategory" class="form-select" style="width: 200px;">
             <option value="">Categories</option>
-            @foreach ($categories as $category)
-            <option value="{{ $category->id }}">{{ $category->getTranslation('name',app()->getLocale()) }}</option>
-            @endforeach
         </select>
     </div>
     <table class="table table-bordered" id="productsTable">
@@ -25,7 +22,18 @@
 @endsection
 @push('scripts')
 <script>
-    $(function() {
+    $(document).ready(function()  {
+          $('#filterByCategory').select2({
+        placeholder: 'Select a category',
+        allowClear: true,
+        ajax: {
+            url: '/categories/ajax',
+            dataType: 'json',
+            processResults: function(data) {
+                return { results: data };
+            }
+        }
+    });
         var table = $('#productsTable').DataTable({
             processing: true,
             serverSide: true,

@@ -16,36 +16,54 @@
         <div class="form-group mb-3">
             <label for="category_id">Category</label>
             <select name="category_id" id="category_id" class="form-control">
-            @foreach ($categories as $c)
-                <option value="{{ $c->id }}" {{ old('category_id')== $c->id ? 'selected' : ''}}>
-                    {{ $c->getTranslation('name',app()->getLocale()) }}
-                </option>
-            
-            @endforeach
             </select>
         </div>
         <ul class="nav nav-tabs mb-3" id="langTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="en-tab" data-bs-toggle="tab" href="#en" role="tab">English</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="ar-tab" data-bs-toggle="tab" href="#ar" role="tab">Arabic</a>
-            </li>
+            @foreach (config('locales') as $locale => $label)
+                <li class="nav-item">
+                    <a class="nav-link {{ $loop->first ? 'active' : '' }}" id="{{ $locale }}-tap" data-bs-toggle="tab" href="#{{ $locale }}" role="tab">{{ $label }}</a>
+                </li>
+            @endforeach
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="en" role="tabpanel">
-                <label for="name_en">Product Name (EN)</label>
-                <input type="text" name="name[en]" id="name_en" class="form-control" value="{{ old('name.en') }}">
-            </div>
-        </div>
-        <div class="tab-content">
-            <div class="tab-pane fade show " id="ar" role="tabpanel">
-                <label for="name_ar">Product Name (AR)</label>
-                <input type="text" name="name[ar]" id="name_ar" class="form-control" value="{{ old('name.ar') }}">
-            </div>
+             @foreach (config('locales') as $locale => $label)
+                <div class="tab-pane fade {{ $loop->first ? 'active' : ''}}" id="{{ $locale }}" role="tabpanel">
+                    <label for="name_{{ $locale }}">Product Name ({{$label}})</label>
+                    <input type="text" name="name[{{ $locale }}]" id="name_{{ $locale }}" class="form-control" value="{{ old('name.'.$locale ) }}">
+                </div>
+            @endforeach    
         </div>
         <button type="submit" class="btn btn-primary">Create Product</button>
     </form>
 </div>
-
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('#category_id').select2({
+        placeholder: 'Select a category',
+        ajax: {
+            url: '/categories/ajax',  
+            dataType: 'json',
+            processResults: function(data) {
+                return {
+                    results: data
+                };
+            }
+        }
+    });
+
+    @if(isset($product))
+        var categoryOption = new Option(
+            '{{ $product->category->getTranslation("name", app()->getLocale()) }}',
+            '{{ $product->category_id }}',
+            true,
+            true
+        );
+        $('#category_id').append(categoryOption).trigger('change');
+    @endif
+});
+</script>
+@endpush
+
+
